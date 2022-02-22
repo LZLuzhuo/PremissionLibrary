@@ -16,7 +16,7 @@ public abstract class PermissionCallback {
      * @param isAllGranted 是否全部申请通过, true是, false否
      * @param denieds 未通过申请的权限
      */
-    public void onRequst(boolean isAllGranted, List<String> denieds){}
+    public void onRequst(boolean isAllGranted, List<String> denieds) { }
 
     /**
      * 所有权限申请通过时调用
@@ -28,5 +28,12 @@ public abstract class PermissionCallback {
      * 有申请的权限不通过时调用
      * @param denieds
      */
-    public void onDenieds(List<String> denieds){}
+    public void onDenieds(List<String> denieds) { }
+
+    /**
+     * 被永久拒绝的权限
+     * 有申请的权限被永久禁用时调用
+     * @param foreverDenieds
+     */
+    public void onForeverDenieds(List<String> foreverDenieds) { }
 }
