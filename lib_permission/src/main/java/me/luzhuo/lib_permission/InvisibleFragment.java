@@ -7,6 +7,9 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import me.luzhuo.lib_sqlite.search_history.SearchHistoryDBManager;
+import me.luzhuo.lib_sqlite.search_history.SystemType;
+import me.luzhuo.lib_sqlite.search_history.bean.SearchHistoryBean;
 
 /**
  * Description: 实现原理, Fragment存在一份与Activity相同的API, 使得 Fragment 也能申请权限.
@@ -19,9 +22,11 @@ import androidx.fragment.app.Fragment;
 public class InvisibleFragment extends Fragment {
 
     private PermissionCallback requestCallback;
+    private SearchHistoryDBManager foreverDeniedDB;
 
     public void requestPermission(PermissionCallback callback, String... permissions){
         this.requestCallback = callback;
+        this.foreverDeniedDB = new SearchHistoryDBManager(requireContext());
         requestPermissions(permissions, 0x01);
     }
 
@@ -31,11 +36,12 @@ public class InvisibleFragment extends Fragment {
         if (requestCode == 0x01) {
             List<String> deniedList = new ArrayList<>(); // 存放被拒绝的权限
             List<String> foreverDeniedList = new ArrayList<>(); // 存放永久被拒绝的权限
+            List<SearchHistoryBean> historyForeverDeniedList = foreverDeniedDB.query(SystemType.Type_Permission_ForeverDenied_History, Integer.MAX_VALUE);
 
             for (int i = 0; i < grantResults.length; i++) {
                 // 将未通过申请的权限, 添加到拒绝的权限列表中
                 if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
-                    deniedList.add(permissions[i]);
+                    // deniedList.add(permissions[i]);
                     /*
                     拥有 [仅使用时允许] [每次询问] [禁止] 的设备:
                     第一次拒绝: -1拒绝 & true
@@ -46,17 +52,26 @@ public class InvisibleFragment extends Fragment {
                     第一次拒绝: -1拒绝 & false
                     永久拒绝:   -1拒绝 & false (不再弹窗)
                      */
-                    if (!shouldShowRequestPermissionRationale(permissions[i])) foreverDeniedList.add(permissions[i]);
+                    if (!shouldShowRequestPermissionRationale(permissions[i])) {
+                        SearchHistoryBean history = new SearchHistoryBean(SystemType.Type_Permission_ForeverDenied_History, permissions[i]);
+                        foreverDeniedDB.add(history);
+                        // 第一次记录的时候, 不会添加到永久禁止名单里, 此时会有系统弹窗;
+                        // 第二次记录的时候, 会被添加到永久禁止名单里, 此时不会有系统弹窗.
+                        if (historyForeverDeniedList.contains(history)) foreverDeniedList.add(permissions[i]);
+                        else deniedList.add(permissions[i]);
+                    } else {
+                        deniedList.add(permissions[i]);
+                    }
                 }
             }
             // 是否所有权限都被同意
-            boolean allGranted = deniedList.size() <= 0;
+            boolean allGranted = deniedList.isEmpty() && foreverDeniedList.isEmpty();
 
             if(requestCallback != null) {
-                requestCallback.onRequst(allGranted, deniedList);
+                requestCallback.onRequst(allGranted, deniedList, foreverDeniedList);
                 if(allGranted) requestCallback.onGranted();
-                if(!allGranted) requestCallback.onDenieds(deniedList);
-                if(foreverDeniedList.size() > 0) requestCallback.onForeverDenieds(foreverDeniedList);
+                if(!deniedList.isEmpty()) requestCallback.onDenieds(deniedList);
+                if(!foreverDeniedList.isEmpty()) requestCallback.onForeverDenieds(foreverDeniedList);
             }
         }
     }
