@@ -1,5 +1,11 @@
 package me.luzhuo.lib_permission;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.text.TextUtils;
+
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
@@ -15,6 +21,9 @@ public class Permission {
 
     private static final String tag = "invisibleFragment";
 
+    /**
+     * 请求权限
+     */
     public static void request(FragmentActivity activity, PermissionCallback requestCallback, String... permissions) {
         final FragmentManager fragmentManager = activity.getSupportFragmentManager();
         final Fragment exitedFragment = fragmentManager.findFragmentByTag(tag);
@@ -25,7 +34,7 @@ public class Permission {
         else {
             // 把新创建的Fragment添加到Activity中
             final InvisibleFragment invisibleFragment = new InvisibleFragment();
-            fragmentManager.beginTransaction().add(invisibleFragment, tag).commitNow(); // commitNow() 立即执行添加
+            fragmentManager.beginTransaction().add(invisibleFragment, tag).commitNowAllowingStateLoss(); // commitNow() 立即执行添加
             fragment = invisibleFragment;
         }
         fragment.requestPermission(requestCallback, permissions);
@@ -33,5 +42,13 @@ public class Permission {
 
     public static void request(Fragment fragment, PermissionCallback requestCallback, String... permissions) {
         request(fragment.getActivity(), requestCallback, permissions);
+    }
+
+    /**
+     * 检查使用拥有该权限
+     */
+    public static boolean checkPermission(Context context, String permission) {
+        if (context == null || TextUtils.isEmpty(permission)) return false;
+        return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
     }
 }
