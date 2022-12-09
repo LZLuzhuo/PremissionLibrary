@@ -1,3 +1,17 @@
+/* Copyright 2020 Luzhuo. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package me.luzhuo.lib_permission;
 
 import android.content.pm.PackageManager;
@@ -6,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RestrictTo;
 import androidx.fragment.app.Fragment;
 import me.luzhuo.lib_sqlite.search_history.SearchHistoryDBManager;
 import me.luzhuo.lib_sqlite.search_history.SystemType;
@@ -19,12 +35,16 @@ import me.luzhuo.lib_sqlite.search_history.bean.SearchHistoryBean;
  * @Creation Date: 2020/9/11 1:04
  * @Copyright: Copyright 2020 Luzhuo. All rights reserved.
  **/
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 public class InvisibleFragment extends Fragment {
 
     private PermissionCallback requestCallback;
     private SearchHistoryDBManager foreverDeniedDB;
 
-    public void requestPermission(PermissionCallback callback, String... permissions){
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    public InvisibleFragment() {}
+
+    public void requestPermission(@Nullable PermissionCallback callback, @NonNull String... permissions){
         this.requestCallback = callback;
         this.foreverDeniedDB = new SearchHistoryDBManager(requireContext());
         requestPermissions(permissions, 0x01);

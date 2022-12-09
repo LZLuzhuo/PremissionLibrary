@@ -3,14 +3,12 @@
 # 1. 导包
 
 ```groovy
-implementation 'me.luzhuo.android:lib_permission:1.0.1-SNAPSHOT'
-
-implementation 'androidx.appcompat:appcompat:1.2.0'
+implementation 'me.luzhuo.android:lib_permission:1.1.5'
 ```
 
 # 2. 使用文档
 
-https://www.yuque.com/luzhuo/library
+https://www.yuque.com/luzhuo/library/lib_permission
 
 # 3. 版权
 

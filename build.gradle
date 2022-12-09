@@ -3,9 +3,8 @@ apply from: this.rootProject.file('../luzhuo.gradle')
 
 buildscript {
     repositories {
-        maven{ url 'http://code.luzhuo.me:8081/repository/luzhuo-public/' }
         google()
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath "com.android.tools.build:gradle:4.0.1"
@@ -17,9 +16,8 @@ buildscript {
 
 allprojects {
     repositories {
-        maven{ url 'http://code.luzhuo.me:8081/repository/luzhuo-public/' }
         google()
-        jcenter()
+        mavenCentral()
     }
 }
 
